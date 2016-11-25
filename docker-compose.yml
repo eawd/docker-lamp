@@ -1,0 +1,23 @@
+version: '2'
+
+services:
+    mysql:
+        image: mysql:5.7
+        ports: 
+            - '3306:3306'
+        volumes:
+            - db_data:/var/lib/mysql
+            - ./conf:/etc/mysql/conf.d
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+    php:
+        build: .
+        links: 
+            - mysql:db
+        ports:
+            - "80:80"
+        volumes:
+            - ./src:/var/www/html
+
+volumes:
+    db_data:
