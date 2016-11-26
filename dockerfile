@@ -1,5 +1,8 @@
 FROM  debian:jessie
 
+ARG PHP_VERSION=5.3.29
+ARG MYSQL_ROOT_PASSWORD=root
+
 MAINTAINER Elsayed Awdallah <comando4ever@gmail.com>
 
 # install apache
@@ -16,11 +19,11 @@ RUN apt-get install -y libmcrypt-dev libmcrypt4
 
 RUN apt-get install -y apache2-dev
 
-RUN export DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # config mysql
-RUN echo mysql-server-5.5 mysql-server/root_password password 1234 | debconf-set-selections
-RUN echo mysql-server-5.5 mysql-server/root_password_again password 1234 | debconf-set-selections
+RUN echo mysql-server-5.5 mysql-server/root_password password $MYSQL_ROOT_PASSWORD | debconf-set-selections
+RUN echo mysql-server-5.5 mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD | debconf-set-selections
 
 # install mysql
 RUN apt-get install -y mysql-server mysql-client libmysqlclient-dev libmysqld-dev
@@ -34,7 +37,7 @@ RUN phpbrew init
 
 RUN echo "[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc" >> ~/.bashrc
 RUN phpbrew update --old
-RUN phpbrew install --old 5.3.29 +default+mysql+apxs2
+RUN phpbrew install --old $PHP_VERSION +default+mysql+apxs2
 
 ENV APACHE_RUN_USER www-data
 ENV APACHE_RUN_GROUP www-data
@@ -48,7 +51,7 @@ RUN /usr/sbin/a2enmod php5
 RUN /usr/sbin/a2enmod rewrite
 RUN /usr/sbin/a2dismod 'mpm_*' && /usr/sbin/a2enmod mpm_prefork
 
-RUN export PHPBREW_PHP=php-5.3.29 && phpbrew ext install gd
+RUN export PHPBREW_PHP=php-$PHP_VERSION && phpbrew ext install gd
 
 # enable modrewrite in .htacssess files.
 RUN sed -in 's/AllowOverride None/AllowOverride all/i' /etc/apache2/apache2.conf
