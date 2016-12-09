@@ -7,7 +7,6 @@ services:
             - '3306:3306'
         volumes:
             - db_data:/var/lib/mysql
-            - ./conf:/etc/mysql/conf.d
         environment:
             MYSQL_ROOT_PASSWORD: root
     php:
@@ -15,7 +14,6 @@ services:
             context: .
             args:
                 PHP_VERSION: 5.3.29
-                MYSQL_ROOT_PASSWORD: root
         links: 
             - mysql:db
         ports:
